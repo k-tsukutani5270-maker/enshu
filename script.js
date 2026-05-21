@@ -6,7 +6,7 @@ const recordList = document.getElementById('record-list');
 document.addEventListener('DOMContentLoaded', loadRecords);
 
 // フォーム送信時の処理
-cafeForm.addEventListener('submit', function(e) {
+cafeForm.addEventListener('submit', async function(e) {
     e.preventDefault();
 
     // 値の取得
@@ -14,75 +14,88 @@ cafeForm.addEventListener('submit', function(e) {
     const location = document.getElementById('location').value;
     const photoFile = document.getElementById('photo').files[0];
     const food = document.getElementById('food').value;
-    
-    // ラジオボタンの評価値取得
     const ratingValue = document.querySelector('input[name="rating"]:checked').value;
-    // ラジオボタンの支払い方法取得
     const payment = document.querySelector('input[name="payment"]:checked').value;
-    
     const nextFood = document.getElementById('next-food').value;
     const memo = document.getElementById('memo').value;
-
     const recordDate = new Date().toLocaleDateString('ja-JP');
 
+    let photoUrl = "";
     if (photoFile) {
-        const reader = new FileReader();
-        reader.onload = function(event) {
-            const photoUrl = event.target.result;
-            const newRecord = {
-                name: shopName,
-                loc: location,
-                photo: photoUrl,
-                food: food,
-                rating: ratingValue,
-                pay: payment,
-                next: nextFood,
-                memo: memo,
-                date: recordDate,
-                tapeClass: getRandomTapeClass()
-            };
-            saveRecord(newRecord);
-            renderCard(newRecord);
-        };
-        reader.readAsDataURL(photoFile);
-    } else {
-        const newRecord = {
-            name: shopName,
-            loc: location,
-            photo: "",
-            food: food,
-            rating: ratingValue,
-            pay: payment,
-            next: nextFood,
-            memo: memo,
-            date: recordDate,
-            tapeClass: getRandomTapeClass()
-        };
-        saveRecord(newRecord);
-        renderCard(newRecord);
+        photoUrl = await new Promise((resolve) => {
+            const reader = new FileReader();
+            reader.onload = (e) => resolve(e.target.result);
+            reader.readAsDataURL(photoFile);
+        });
     }
 
+    const newRecord = {
+        name: shopName,
+        loc: location,
+        photo: photoUrl,
+        food: food,
+        rating: ratingValue,
+        pay: payment,
+        next: nextFood,
+        memo: memo,
+        date: recordDate,
+        tapeClass: getRandomTapeClass()
+    };
+
+    // サーバーに保存
+    await saveRecordToServer(newRecord);
+    
+    // 画面に描画
+    renderCard(newRecord);
+
+    // フォームをリセット
     cafeForm.reset();
 });
 
 /**
- * localStorageにレコードを保存
+ * サーバーにレコードを保存
  */
-function saveRecord(record) {
-    const records = JSON.parse(localStorage.getItem('cafeRecords') || '[]');
-    records.push(record);
-    localStorage.setItem('cafeRecords', JSON.stringify(records));
+async function saveRecordToServer(record) {
+    try {
+        const response = await fetch('/api/records', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(record),
+        });
+        if (!response.ok) throw new Error('Save failed');
+        return await response.json();
+    } catch (err) {
+        console.error('Error saving record:', err);
+        alert('保存に失敗しました。');
+    }
 }
 
 /**
- * localStorageからレコードを読み込み
+ * サーバーからレコードを読み込み
  */
-function loadRecords() {
-    const records = JSON.parse(localStorage.getItem('cafeRecords') || '[]');
-    // 新しい順に表示するためにリバース
-    records.reverse().forEach(record => {
-        renderCard(record);
-    });
+async function loadRecords() {
+    try {
+        const response = await fetch('/api/records');
+        if (!response.ok) throw new Error('Fetch failed');
+        const records = await response.json();
+        
+        // 既存のリストをクリア
+        recordList.innerHTML = '';
+        
+        // サーバーから返ってくるデータは降順なので、そのまま表示
+        records.forEach(record => {
+            // サーバー側はスネークケース(tape_class)なので変換を考慮
+            const formattedRecord = {
+                ...record,
+                tapeClass: record.tape_class || record.tapeClass
+            };
+            renderCard(formattedRecord);
+        });
+    } catch (err) {
+        console.error('Error loading records:', err);
+    }
 }
 
 function getStarString(rating) {
@@ -90,7 +103,6 @@ function getStarString(rating) {
     return "★".repeat(num) + "☆".repeat(5 - num);
 }
 
-// テープのスタイルをランダムに返す
 function getRandomTapeClass() {
     const classes = ['tape-gingham', 'tape-blue', 'tape-yellow'];
     return classes[Math.floor(Math.random() * classes.length)];
@@ -140,7 +152,6 @@ function renderCard(record) {
         </div>
     `;
 
-    // 読み込み時は最後に追加、新規作成時は先頭に追加されるよう調整が必要
-    // loadRecords内でreverseしているので、常にinsertBeforeでOK
-    recordList.insertBefore(card, recordList.firstChild);
+    // 読み込み済みのデータの末尾に追加
+    recordList.appendChild(card);
 }
