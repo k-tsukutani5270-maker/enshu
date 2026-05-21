@@ -1,0 +1,240 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My cafe note</title>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;1,400&family=Noto+Sans+JP:wght@400;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <nav class="navbar">
+        <div class="nav-logo">My cafe note</div>
+        <ul class="nav-links">
+            <li class="active">Home</li>
+            <li>My Cafes</li>
+            <li>Map</li>
+            <li>Favorites</li>
+            <li>Tags</li>
+            <li>Journal</li>
+        </ul>
+        <div class="nav-icons">
+            <span class="icon">🔍</span>
+            <span class="icon">🔔</span>
+            <div class="user-profile">
+                <div class="avatar-circle"></div>
+                <span class="user-name">Sora ▾</span>
+            </div>
+        </div>
+    </nav>
+
+    <header class="hero">
+        <div class="hero-content">
+            <div class="decoration-sparkle">✦</div>
+            <div class="decoration-wavy">~~~~</div>
+            <h1 class="hero-title">My<br>cafe note</h1>
+            <p class="hero-subtitle">カフェの瞬間を記録し、あなただけの物語を残そう。</p>
+            <p class="hero-desc">
+                Record the cafes you love,<br>
+                the moments that stay with you.<br>
+                Your cafe journey, beautifully chronicled.
+            </p>
+        </div>
+        <div class="hero-decoration">
+            <div class="polaroid p1"><div class="img-placeholder" style="background-image: url('https://images.unsplash.com/photo-1509042239860-f550ce710b93?auto=format&fit=crop&w=200&q=80')"></div></div>
+            <div class="polaroid p2"><div class="img-placeholder" style="background-image: url('https://images.unsplash.com/photo-1517705008128-361805f42e86?auto=format&fit=crop&w=200&q=80')"></div></div>
+            <div class="polaroid p3"><div class="img-placeholder" style="background-image: url('https://images.unsplash.com/photo-1511920170033-f8396924c348?auto=format&fit=crop&w=200&q=80')"></div></div>
+            <div class="note-paper">
+                <div class="paperclip"></div>
+                Today is<br>a good day<br>for coffee
+            </div>
+            <div class="decoration-leaves">🌿</div>
+        </div>
+    </header>
+
+    <main class="main-container">
+        <div class="content-grid">
+            <section class="form-section">
+                <div class="form-card">
+                    <div class="form-header">
+                        <h2 class="form-title"><span class="icon">☕</span> Add a new cafe note</h2>
+                        <span class="form-subtitle">カフェを追加する</span>
+                    </div>
+                    <form id="cafe-form">
+                        <div class="form-row-flex">
+                            <label for="shop-name">Cafe name</label>
+                            <input type="text" id="shop-name" placeholder="Cafe name" required>
+                        </div>
+
+                        <div class="form-row-flex">
+                            <label for="location">Location</label>
+                            <div class="input-with-icon">
+                                <input type="text" id="location" placeholder="例) Tokyo, Japan" required>
+                                <span class="input-icon">📍</span>
+                            </div>
+                        </div>
+
+                        <div class="form-row-flex vertical-align-start">
+                            <label>Photo</label>
+                            <div class="photo-uploader">
+                                <label for="photo" class="upload-main">
+                                    <span class="icon">📷</span><br>
+                                    Upload photos<br>
+                                    <span class="small">(最大4枚まで)</span>
+                                </label>
+                                <input type="file" id="photo" accept="image/*" hidden>
+                                <div class="photo-slots">
+                                    <div class="slot">+</div>
+                                    <div class="slot">+</div>
+                                    <div class="slot">+</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="form-row-flex">
+                            <label for="food">Food / Drink</label>
+                            <input type="text" id="food" placeholder="例) カフェラテ、ショートケーキ">
+                        </div>
+
+                        <div class="form-row-flex">
+                            <label>Rating</label>
+                            <div class="star-rating-select">
+                                <input type="radio" name="rating" value="5" id="r5"><label for="r5">☆</label>
+                                <input type="radio" name="rating" value="4" id="r4"><label for="r4">☆</label>
+                                <input type="radio" name="rating" value="3" id="r3" checked><label for="r3">☆</label>
+                                <input type="radio" name="rating" value="2" id="r2"><label for="r2">☆</label>
+                                <input type="radio" name="rating" value="1" id="r1"><label for="r1">☆</label>
+                                <span class="rating-label">Select rating</span>
+                            </div>
+                        </div>
+
+                        <div class="form-row-flex">
+                            <label>Payment</label>
+                            <div class="radio-group">
+                                <label><input type="radio" name="payment" value="Card" checked> Card</label>
+                                <label><input type="radio" name="payment" value="Cash"> Cash</label>
+                                <label><input type="radio" name="payment" value="PayPay"> PayPay</label>
+                                <label><input type="radio" name="payment" value="Other"> Other</label>
+                            </div>
+                        </div>
+
+                        <div class="form-row-flex">
+                            <label for="next-food">What to try next</label>
+                            <input type="text" id="next-food" placeholder="次回に試したいメニューは？">
+                        </div>
+
+                        <div class="form-row-flex vertical-align-start">
+                            <label for="memo">Memo</label>
+                            <textarea id="memo" rows="4" placeholder="感じた雰囲気、一言メモなど :)"></textarea>
+                        </div>
+
+                        <div class="form-submit-row">
+                            <button type="submit" class="submit-button">
+                                <span class="icon">☕</span> Save cafe note
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </section>
+
+            <aside class="sidebar">
+                <div class="sidebar-card map-section">
+                    <div class="card-header">
+                        <h3 class="card-title">📍 My cafe map</h3>
+                        <a href="#" class="header-link">全体図を見る ></a>
+                    </div>
+                    <div class="map-visual">
+                        <div class="map-pin p1">☕</div>
+                        <div class="map-pin p2">☕</div>
+                        <div class="map-pin p3">☕</div>
+                        <div class="map-pin p4">☕</div>
+                    </div>
+                    <div class="map-legend">
+                        <span><span class="dot d1"></span> 最近行った</span>
+                        <span><span class="dot d2"></span> 行きたい</span>
+                        <span><span class="dot d3"></span> よく行く</span>
+                    </div>
+                </div>
+
+                <div class="sidebar-card tip-section">
+                    <h3 class="card-title">Today's tip</h3>
+                    <p class="tip-subtitle">アイスバニララテを美味しく楽しむ ☕</p>
+                    <div class="tip-content">
+                        <div class="tip-text">
+                            シロップを少なめにすると<br>
+                            コーヒーの香りが引き立ちます。<br>
+                            シナモンパウダーを振るのもおすすめ！
+                        </div>
+                        <div class="tip-image">🥤</div>
+                    </div>
+                </div>
+            </aside>
+        </div>
+
+        <section class="list-section">
+            <div class="list-header">
+                <div class="list-title-group">
+                    <div class="decoration-sparkle small">✦</div>
+                    <h2 class="section-title">My saved cafes</h2>
+                </div>
+                <div class="list-controls">
+                    <div class="filters">
+                        <button class="filter-btn active">All</button>
+                        <button class="filter-btn">Favorites</button>
+                        <button class="filter-btn">Visited</button>
+                        <button class="filter-btn">Want to go</button>
+                    </div>
+                    <div class="view-options">
+                        <select class="sort-select">
+                            <option>最新順</option>
+                            <option>評価順</option>
+                        </select>
+                        <div class="view-icons">
+                            <span class="icon active">▦</span>
+                            <span class="icon">▤</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div id="record-list" class="record-grid">
+                <!-- Cards added here -->
+            </div>
+            
+            <div class="load-more">
+                <button class="load-more-btn">もっとカフェを見る ▾</button>
+            </div>
+        </section>
+    </main>
+
+    <footer class="footer">
+        <div class="footer-grid">
+            <div class="footer-brand">
+                <h3 class="footer-logo">My cafe note</h3>
+                <p>大好きなカフェを記録して、<br>あなただけの物語をあつめよう。</p>
+            </div>
+            <div class="footer-links">
+                <div class="link-column">
+                    <h4>サービス</h4>
+                    <ul><li>My Cafes</li><li>Map</li><li>Favorites</li></ul>
+                </div>
+                <div class="link-column">
+                    <h4>サポート</h4>
+                    <ul><li>ガイド</li><li>Q&A</li><li>お問い合わせ</li></ul>
+                </div>
+            </div>
+            <div class="footer-social">
+                <h4>Follow us</h4>
+                <div class="social-icons">
+                    <span>📸</span><span>𝕏</span><span>📌</span>
+                </div>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            &copy; 2024 My cafe note. All rights reserved.
+        </div>
+    </footer>
+
+    <script src="script.js"></script>
+</body>
+</html>
