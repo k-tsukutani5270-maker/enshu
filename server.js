@@ -7,17 +7,17 @@ const app = express();
 const port = process.env.PORT || 3000;
 
 // PostgreSQLの接続設定
-// Render環境では DATABASE_URL 環境変数が自動的に設定されます
 const pool = new Pool({
   connectionString: process.env.DATABASE_URL,
   ssl: {
-    rejectUnauthorized: false // Renderのデータベース接続に必要
+    rejectUnauthorized: false
   }
 });
 
-// テーブル作成 (起動時に実行)
+// テーブル作成 & カラム追加 (起動時に実行)
 const initDb = async () => {
   try {
+    // 基本テーブル作成
     await pool.query(`
       CREATE TABLE IF NOT EXISTS cafe_records (
         id SERIAL PRIMARY KEY,
@@ -33,6 +33,13 @@ const initDb = async () => {
         tape_class TEXT
       )
     `);
+
+    // lat, lng カラムが存在しない場合は追加
+    await pool.query(`
+      ALTER TABLE cafe_records ADD COLUMN IF NOT EXISTS lat DOUBLE PRECISION;
+      ALTER TABLE cafe_records ADD COLUMN IF NOT EXISTS lng DOUBLE PRECISION;
+    `);
+
     console.log('Database initialized');
   } catch (err) {
     console.error('Error initializing database:', err);
@@ -58,15 +65,15 @@ app.get('/api/records', async (req, res) => {
 
 // APIエンドポイント: 新しい記録を保存
 app.post('/api/records', async (req, res) => {
-  const { name, loc, photo, food, rating, pay, next, memo, date, tapeClass } = req.body;
-  
+  const { name, loc, photo, food, rating, pay, next, memo, date, tapeClass, lat, lng } = req.body;
+
   try {
     const result = await pool.query(`
-      INSERT INTO cafe_records (name, loc, photo, food, rating, pay, next, memo, date, tape_class)
-      VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)
+      INSERT INTO cafe_records (name, loc, photo, food, rating, pay, next, memo, date, tape_class, lat, lng)
+      VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12)
       RETURNING id
-    `, [name, loc, photo, food, rating, pay, next, memo, date, tapeClass]);
-    
+    `, [name, loc, photo, food, rating, pay, next, memo, date, tapeClass, lat, lng]);
+
     res.json({ id: result.rows[0].id, success: true });
   } catch (err) {
     console.error(err);
@@ -78,3 +85,4 @@ app.post('/api/records', async (req, res) => {
 app.listen(port, () => {
   console.log(`Server is running at port ${port}`);
 });
+

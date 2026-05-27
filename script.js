@@ -2,8 +2,42 @@
 const cafeForm = document.getElementById('cafe-form');
 const recordList = document.getElementById('record-list');
 
-// ページ読み込み時に保存されたデータを表示
-document.addEventListener('DOMContentLoaded', loadRecords);
+// Leafletマップの初期化
+let map;
+let markers = [];
+
+function initMap() {
+    // 地図の初期表示（日本を中心に設定）
+    map = L.map('sidebar-map').setView([35.681236, 139.767125], 10);
+
+    // OpenStreetMapのタイルレイヤーを追加
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        attribution: '&copy; OpenStreetMap contributors'
+    }).addTo(map);
+}
+
+// ページ読み込み時に実行
+document.addEventListener('DOMContentLoaded', () => {
+    initMap();
+    loadRecords();
+});
+
+// 住所から緯度経度を取得する関数 (OpenStreetMap Nominatim APIを使用)
+async function getLatLng(location) {
+    try {
+        const response = await fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(location)}`);
+        const data = await response.json();
+        if (data && data.length > 0) {
+            return {
+                lat: parseFloat(data[0].lat),
+                lng: parseFloat(data[0].lon)
+            };
+        }
+    } catch (err) {
+        console.error('Geocoding error:', err);
+    }
+    return null;
+}
 
 // フォーム送信時の処理
 cafeForm.addEventListener('submit', async function(e) {
@@ -24,6 +58,9 @@ cafeForm.addEventListener('submit', async function(e) {
     const nextFood = document.getElementById('next-food').value;
     const memo = document.getElementById('memo').value;
     const recordDate = new Date().toLocaleDateString('ja-JP');
+
+    // 住所から座標を取得
+    const coords = await getLatLng(location);
 
     let photoUrls = [];
     if (photoFiles.length > 0) {
@@ -49,7 +86,9 @@ cafeForm.addEventListener('submit', async function(e) {
         next: nextFood,
         memo: memo,
         date: recordDate,
-        tapeClass: getRandomTapeClass()
+        tapeClass: getRandomTapeClass(),
+        lat: coords ? coords.lat : null,
+        lng: coords ? coords.lng : null
     };
 
     // サーバーに保存
@@ -58,9 +97,27 @@ cafeForm.addEventListener('submit', async function(e) {
     // 画面に描画
     renderCard(newRecord);
 
+    // マップにピンを追加
+    if (coords) {
+        addMarkerToMap(newRecord);
+        map.setView([coords.lat, coords.lng], 13);
+    }
+
     // フォームをリセット
     cafeForm.reset();
 });
+
+/**
+ * マップにマーカーを追加
+ */
+function addMarkerToMap(record) {
+    if (record.lat && record.lng) {
+        const marker = L.marker([record.lat, record.lng])
+            .addTo(map)
+            .bindPopup(`<b>${record.name}</b><br>${record.loc}`);
+        markers.push(marker);
+    }
+}
 
 /**
  * サーバーにレコードを保存
@@ -91,18 +148,25 @@ async function loadRecords() {
         if (!response.ok) throw new Error('Fetch failed');
         const records = await response.json();
         
-        // 既存のリストをクリア
+        // 既存のリストとマーカーをクリア
         recordList.innerHTML = '';
+        markers.forEach(m => map.removeLayer(m));
+        markers = [];
         
-        // サーバーから返ってくるデータは降順なので、そのまま表示
         records.forEach(record => {
-            // サーバー側はスネークケース(tape_class)なので変換を考慮
             const formattedRecord = {
                 ...record,
                 tapeClass: record.tape_class || record.tapeClass
             };
             renderCard(formattedRecord);
+            addMarkerToMap(formattedRecord);
         });
+
+        // 全てのマーカーが見えるように表示範囲を調整
+        if (markers.length > 0) {
+            const group = new L.featureGroup(markers);
+            map.fitBounds(group.getBounds().pad(0.1));
+        }
     } catch (err) {
         console.error('Error loading records:', err);
     }

@@ -427,14 +427,12 @@ body {
 
 .map-visual {
     height: 250px;
-    background: rgba(255,255,255,0.2);
+    background: #f0f0f0;
     border-radius: 15px;
     position: relative;
     overflow: hidden;
     margin-bottom: 1rem;
-    display: flex;
-    align-items: center;
-    justify-content: center;
+    z-index: 1; /* マップが正しく表示されるように */
 }
 
 .map-pin {
