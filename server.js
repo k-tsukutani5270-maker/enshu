@@ -30,14 +30,18 @@ const initDb = async () => {
         next TEXT,
         memo TEXT,
         date TEXT,
-        tape_class TEXT
+        tape_class TEXT,
+        lat DOUBLE PRECISION,
+        lng DOUBLE PRECISION,
+        is_favorite BOOLEAN DEFAULT FALSE
       )
     `);
 
-    // lat, lng カラムが存在しない場合は追加
+    // カラムが存在しない場合は追加 (既存ユーザー向け)
     await pool.query(`
       ALTER TABLE cafe_records ADD COLUMN IF NOT EXISTS lat DOUBLE PRECISION;
       ALTER TABLE cafe_records ADD COLUMN IF NOT EXISTS lng DOUBLE PRECISION;
+      ALTER TABLE cafe_records ADD COLUMN IF NOT EXISTS is_favorite BOOLEAN DEFAULT FALSE;
     `);
 
     console.log('Database initialized');
@@ -75,6 +79,20 @@ app.post('/api/records', async (req, res) => {
     `, [name, loc, photo, food, rating, pay, next, memo, date, tapeClass, lat, lng]);
 
     res.json({ id: result.rows[0].id, success: true });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// APIエンドポイント: お気に入り状態の切り替え
+app.patch('/api/records/:id/favorite', async (req, res) => {
+  const { id } = req.params;
+  const { isFavorite } = req.body;
+
+  try {
+    await pool.query('UPDATE cafe_records SET is_favorite = $1 WHERE id = $2', [isFavorite, id]);
+    res.json({ success: true });
   } catch (err) {
     console.error(err);
     res.status(500).json({ error: err.message });

@@ -1,16 +1,18 @@
 // フォームと一覧の要素を取得
 const cafeForm = document.getElementById('cafe-form');
 const recordList = document.getElementById('record-list');
+const filterBtns = document.querySelectorAll('.filter-btn');
+
+// 状態管理
+let allRecords = [];
+let currentFilter = 'All';
 
 // Leafletマップの初期化
 let map;
 let markers = [];
 
 function initMap() {
-    // 地図の初期表示（日本を中心に設定）
     map = L.map('sidebar-map').setView([35.681236, 139.767125], 10);
-
-    // OpenStreetMapのタイルレイヤーを追加
     L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
         attribution: '&copy; OpenStreetMap contributors'
     }).addTo(map);
@@ -20,9 +22,33 @@ function initMap() {
 document.addEventListener('DOMContentLoaded', () => {
     initMap();
     loadRecords();
+    setupFilters();
 });
 
-// 住所から緯度経度を取得する関数 (OpenStreetMap Nominatim APIを使用)
+// フィルターボタンの設定
+function setupFilters() {
+    filterBtns.forEach(btn => {
+        btn.addEventListener('click', () => {
+            filterBtns.forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+            currentFilter = btn.textContent;
+            applyFilter();
+        });
+    });
+}
+
+function applyFilter() {
+    let filtered = allRecords;
+    if (currentFilter === 'Favorites') {
+        filtered = allRecords.filter(r => r.is_favorite);
+    }
+    
+    // 既存のリストをクリアして再描画
+    recordList.innerHTML = '';
+    filtered.forEach(record => renderCard(record));
+}
+
+// 住所から緯度経度を取得
 async function getLatLng(location) {
     try {
         const response = await fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(location)}`);
@@ -43,14 +69,12 @@ async function getLatLng(location) {
 cafeForm.addEventListener('submit', async function(e) {
     e.preventDefault();
 
-    // 値の取得
     const shopName = document.getElementById('shop-name').value;
     const location = document.getElementById('location').value;
     const photoFiles = document.getElementById('photo').files;
     const food = document.getElementById('food').value;
     const ratingValue = document.querySelector('input[name="rating"]:checked').value;
     
-    // 支払い方法（複数選択）の取得
     const paymentCheckboxes = document.querySelectorAll('input[name="payment"]:checked');
     const payments = Array.from(paymentCheckboxes).map(cb => cb.value);
     const paymentString = payments.length > 0 ? payments.join(', ') : 'None';
@@ -59,12 +83,10 @@ cafeForm.addEventListener('submit', async function(e) {
     const memo = document.getElementById('memo').value;
     const recordDate = new Date().toLocaleDateString('ja-JP');
 
-    // 住所から座標を取得
     const coords = await getLatLng(location);
 
     let photoUrls = [];
     if (photoFiles.length > 0) {
-        // 全てのファイルをBase64に変換
         for (let i = 0; i < photoFiles.length; i++) {
             const url = await new Promise((resolve) => {
                 const reader = new FileReader();
@@ -78,32 +100,30 @@ cafeForm.addEventListener('submit', async function(e) {
     const newRecord = {
         name: shopName,
         loc: location,
-        // 配列を文字列として保存（DB側の互換性のため）
         photo: JSON.stringify(photoUrls),
         food: food,
         rating: ratingValue,
-        pay: paymentString, // カンマ区切りの文字列として保存
+        pay: paymentString,
         next: nextFood,
         memo: memo,
         date: recordDate,
         tapeClass: getRandomTapeClass(),
         lat: coords ? coords.lat : null,
-        lng: coords ? coords.lng : null
+        lng: coords ? coords.lng : null,
+        is_favorite: false
     };
 
-    // サーバーに保存
-    await saveRecordToServer(newRecord);
-    
-    // 画面に描画
-    renderCard(newRecord);
-
-    // マップにピンを追加
-    if (coords) {
-        addMarkerToMap(newRecord);
-        map.setView([coords.lat, coords.lng], 13);
+    const savedRecord = await saveRecordToServer(newRecord);
+    if (savedRecord) {
+        newRecord.id = savedRecord.id;
+        allRecords.unshift(newRecord);
+        applyFilter();
+        if (coords) {
+            addMarkerToMap(newRecord);
+            map.setView([coords.lat, coords.lng], 13);
+        }
     }
 
-    // フォームをリセット
     cafeForm.reset();
 });
 
@@ -126,16 +146,30 @@ async function saveRecordToServer(record) {
     try {
         const response = await fetch('/api/records', {
             method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
+            headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(record),
         });
         if (!response.ok) throw new Error('Save failed');
         return await response.json();
     } catch (err) {
         console.error('Error saving record:', err);
-        alert('保存に失敗しました。データサイズが大きすぎる可能性があります（写真は1投稿につき数枚までを推奨します）。');
+        alert('保存に失敗しました。');
+    }
+}
+
+/**
+ * お気に入り状態をサーバーに保存
+ */
+async function toggleFavoriteOnServer(id, isFavorite) {
+    try {
+        const response = await fetch(`/api/records/${id}/favorite`, {
+            method: 'PATCH',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ isFavorite }),
+        });
+        if (!response.ok) throw new Error('Toggle favorite failed');
+    } catch (err) {
+        console.error('Error toggling favorite:', err);
     }
 }
 
@@ -146,23 +180,20 @@ async function loadRecords() {
     try {
         const response = await fetch('/api/records');
         if (!response.ok) throw new Error('Fetch failed');
-        const records = await response.json();
+        allRecords = await response.json();
         
-        // 既存のリストとマーカーをクリア
-        recordList.innerHTML = '';
+        // 既存のマーカーをクリア
         markers.forEach(m => map.removeLayer(m));
         markers = [];
         
-        records.forEach(record => {
-            const formattedRecord = {
-                ...record,
-                tapeClass: record.tape_class || record.tapeClass
-            };
-            renderCard(formattedRecord);
-            addMarkerToMap(formattedRecord);
+        allRecords.forEach(record => {
+            record.tapeClass = record.tape_class || record.tapeClass;
+            record.is_favorite = record.is_favorite || false;
+            addMarkerToMap(record);
         });
 
-        // 全てのマーカーが見えるように表示範囲を調整
+        applyFilter();
+
         if (markers.length > 0) {
             const group = new L.featureGroup(markers);
             map.fitBounds(group.getBounds().pad(0.1));
@@ -192,17 +223,13 @@ function renderCard(record) {
     const encodedLoc = encodeURIComponent(record.loc);
     const mapsUrl = `https://www.google.com/maps/search/?api=1&query=${encodedLoc}`;
 
-    // 写真データのパース
     let photos = [];
     try {
-        // 文字列として保存されている配列を復元
         photos = JSON.parse(record.photo || '[]');
         if (!Array.isArray(photos)) {
-            // 古いデータ（単一のURL文字列）の場合
             photos = record.photo ? [record.photo] : [];
         }
     } catch (e) {
-        // パースに失敗した場合は単一のURLとして扱う
         photos = record.photo ? [record.photo] : [];
     }
 
@@ -224,6 +251,9 @@ function renderCard(record) {
 
     card.innerHTML = `
         <div class="tape ${record.tapeClass || getRandomTapeClass()}"></div>
+        <button class="favorite-btn ${record.is_favorite ? 'active' : ''}" onclick="toggleFavorite(this, ${record.id})">
+            ${record.is_favorite ? '❤️' : '🤍'}
+        </button>
         <div class="bookmark"></div>
         ${imageHtml}
         <div class="card-content">
@@ -252,13 +282,28 @@ function renderCard(record) {
         </div>
     `;
 
-    // 読み込み済みのデータの末尾に追加
     recordList.appendChild(card);
 }
 
 /**
- * ギャラリーの画像を切り替える（グローバル関数として定義）
+ * お気に入り切り替え
  */
+window.toggleFavorite = async function(btn, id) {
+    const record = allRecords.find(r => r.id === id);
+    if (!record) return;
+
+    record.is_favorite = !record.is_favorite;
+    btn.classList.toggle('active');
+    btn.innerHTML = record.is_favorite ? '❤️' : '🤍';
+
+    await toggleFavoriteOnServer(id, record.is_favorite);
+    
+    // お気に入りフィルター中なら、解除されたときにカードを消す
+    if (currentFilter === 'Favorites' && !record.is_favorite) {
+        applyFilter();
+    }
+};
+
 window.changeImage = function(btn, direction) {
     const gallery = btn.closest('.card-image-gallery');
     const images = gallery.querySelectorAll('.card-image');

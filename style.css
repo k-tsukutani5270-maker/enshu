@@ -580,14 +580,34 @@ body {
     gap: 3rem;
 }
 
-/* カードリデザイン */
-.card {
+/* お気に入りボタン */
+.favorite-btn {
+    position: absolute;
+    top: 15px;
+    right: 50px; /* bookmarkの左側 */
     background: white;
-    border-radius: 15px;
-    padding: 1.2rem;
-    box-shadow: 0 10px 20px rgba(0,0,0,0.04);
-    position: relative;
-    transition: transform 0.3s;
+    border: 1px solid #eee;
+    border-radius: 50%;
+    width: 35px;
+    height: 35px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    z-index: 11;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+    transition: transform 0.2s, background-color 0.2s;
+    font-size: 1.1rem;
+}
+
+.favorite-btn:hover {
+    transform: scale(1.1);
+    background-color: #fff0f0;
+}
+
+.favorite-btn.active {
+    border-color: #ffcdd2;
+    background-color: #fff9f9;
 }
 
 .card:hover { transform: translateY(-8px); }
