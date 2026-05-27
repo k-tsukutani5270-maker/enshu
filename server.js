@@ -42,7 +42,7 @@ initDb();
 
 // ミドルウェアの設定
 app.use(cors());
-app.use(express.json({ limit: '10mb' }));
+app.use(express.json({ limit: '50mb' }));
 app.use(express.static(path.join(__dirname)));
 
 // APIエンドポイント: 全ての記録を取得

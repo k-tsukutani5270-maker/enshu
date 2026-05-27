@@ -12,30 +12,40 @@ cafeForm.addEventListener('submit', async function(e) {
     // 値の取得
     const shopName = document.getElementById('shop-name').value;
     const location = document.getElementById('location').value;
-    const photoFile = document.getElementById('photo').files[0];
+    const photoFiles = document.getElementById('photo').files;
     const food = document.getElementById('food').value;
     const ratingValue = document.querySelector('input[name="rating"]:checked').value;
-    const payment = document.querySelector('input[name="payment"]:checked').value;
+    
+    // 支払い方法（複数選択）の取得
+    const paymentCheckboxes = document.querySelectorAll('input[name="payment"]:checked');
+    const payments = Array.from(paymentCheckboxes).map(cb => cb.value);
+    const paymentString = payments.length > 0 ? payments.join(', ') : 'None';
+
     const nextFood = document.getElementById('next-food').value;
     const memo = document.getElementById('memo').value;
     const recordDate = new Date().toLocaleDateString('ja-JP');
 
-    let photoUrl = "";
-    if (photoFile) {
-        photoUrl = await new Promise((resolve) => {
-            const reader = new FileReader();
-            reader.onload = (e) => resolve(e.target.result);
-            reader.readAsDataURL(photoFile);
-        });
+    let photoUrls = [];
+    if (photoFiles.length > 0) {
+        // 全てのファイルをBase64に変換
+        for (let i = 0; i < photoFiles.length; i++) {
+            const url = await new Promise((resolve) => {
+                const reader = new FileReader();
+                reader.onload = (e) => resolve(e.target.result);
+                reader.readAsDataURL(photoFiles[i]);
+            });
+            photoUrls.push(url);
+        }
     }
 
     const newRecord = {
         name: shopName,
         loc: location,
-        photo: photoUrl,
+        // 配列を文字列として保存（DB側の互換性のため）
+        photo: JSON.stringify(photoUrls),
         food: food,
         rating: ratingValue,
-        pay: payment,
+        pay: paymentString, // カンマ区切りの文字列として保存
         next: nextFood,
         memo: memo,
         date: recordDate,
@@ -68,7 +78,7 @@ async function saveRecordToServer(record) {
         return await response.json();
     } catch (err) {
         console.error('Error saving record:', err);
-        alert('保存に失敗しました。');
+        alert('保存に失敗しました。データサイズが大きすぎる可能性があります（写真は1投稿につき数枚までを推奨します）。');
     }
 }
 
@@ -118,9 +128,35 @@ function renderCard(record) {
     const encodedLoc = encodeURIComponent(record.loc);
     const mapsUrl = `https://www.google.com/maps/search/?api=1&query=${encodedLoc}`;
 
-    const imageHtml = record.photo 
-        ? `<img src="${record.photo}" alt="${record.name}" class="card-image">`
-        : `<div class="card-image" style="display:flex; align-items:center; justify-content:center; background:#f5f5f5; color:#ddd; font-size:3rem;">☕</div>`;
+    // 写真データのパース
+    let photos = [];
+    try {
+        // 文字列として保存されている配列を復元
+        photos = JSON.parse(record.photo || '[]');
+        if (!Array.isArray(photos)) {
+            // 古いデータ（単一のURL文字列）の場合
+            photos = record.photo ? [record.photo] : [];
+        }
+    } catch (e) {
+        // パースに失敗した場合は単一のURLとして扱う
+        photos = record.photo ? [record.photo] : [];
+    }
+
+    let imageHtml = "";
+    if (photos.length > 0) {
+        imageHtml = `<div class="card-image-gallery">`;
+        photos.forEach((src, index) => {
+            imageHtml += `<img src="${src}" alt="${record.name} - ${index + 1}" class="card-image ${index === 0 ? 'active' : ''}">`;
+        });
+        if (photos.length > 1) {
+            imageHtml += `<div class="gallery-counter">1/${photos.length}</div>`;
+            imageHtml += `<button class="gallery-prev" onclick="changeImage(this, -1)">❮</button>`;
+            imageHtml += `<button class="gallery-next" onclick="changeImage(this, 1)">❯</button>`;
+        }
+        imageHtml += `</div>`;
+    } else {
+        imageHtml = `<div class="card-image" style="display:flex; align-items:center; justify-content:center; background:#f5f5f5; color:#ddd; font-size:3rem;">☕</div>`;
+    }
 
     card.innerHTML = `
         <div class="tape ${record.tapeClass || getRandomTapeClass()}"></div>
@@ -155,3 +191,22 @@ function renderCard(record) {
     // 読み込み済みのデータの末尾に追加
     recordList.appendChild(card);
 }
+
+/**
+ * ギャラリーの画像を切り替える（グローバル関数として定義）
+ */
+window.changeImage = function(btn, direction) {
+    const gallery = btn.closest('.card-image-gallery');
+    const images = gallery.querySelectorAll('.card-image');
+    const counter = gallery.querySelector('.gallery-counter');
+    
+    let activeIndex = Array.from(images).findIndex(img => img.classList.contains('active'));
+    images[activeIndex].classList.remove('active');
+    
+    activeIndex = (activeIndex + direction + images.length) % images.length;
+    images[activeIndex].classList.add('active');
+    
+    if (counter) {
+        counter.textContent = `${activeIndex + 1}/${images.length}`;
+    }
+};

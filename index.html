@@ -82,7 +82,7 @@
                                     Upload photos<br>
                                     <span class="small">(最大4枚まで)</span>
                                 </label>
-                                <input type="file" id="photo" accept="image/*" hidden>
+                                <input type="file" id="photo" accept="image/*" multiple hidden>
                                 <div class="photo-slots">
                                     <div class="slot">+</div>
                                     <div class="slot">+</div>
@@ -111,10 +111,10 @@
                         <div class="form-row-flex">
                             <label>Payment</label>
                             <div class="radio-group">
-                                <label><input type="radio" name="payment" value="Card" checked> Card</label>
-                                <label><input type="radio" name="payment" value="Cash"> Cash</label>
-                                <label><input type="radio" name="payment" value="PayPay"> PayPay</label>
-                                <label><input type="radio" name="payment" value="Other"> Other</label>
+                                <label><input type="checkbox" name="payment" value="Card"> Card</label>
+                                <label><input type="checkbox" name="payment" value="Cash"> Cash</label>
+                                <label><input type="checkbox" name="payment" value="PayPay"> PayPay</label>
+                                <label><input type="checkbox" name="payment" value="Other"> Other</label>
                             </div>
                         </div>
 
