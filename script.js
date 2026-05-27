@@ -72,6 +72,7 @@ cafeForm.addEventListener('submit', async function(e) {
     const shopName = document.getElementById('shop-name').value;
     const location = document.getElementById('location').value;
     const photoFiles = document.getElementById('photo').files;
+    const visitDateValue = document.getElementById('visit-date').value; // 入力された日付
     const food = document.getElementById('food').value;
     const ratingValue = document.querySelector('input[name="rating"]:checked').value;
     
@@ -81,7 +82,9 @@ cafeForm.addEventListener('submit', async function(e) {
 
     const nextFood = document.getElementById('next-food').value;
     const memo = document.getElementById('memo').value;
-    const recordDate = new Date().toLocaleDateString('ja-JP');
+    
+    // 日付のフォーマットを調整 (YYYY-MM-DD -> YYYY/MM/DD)
+    const formattedDate = visitDateValue ? visitDateValue.replace(/-/g, '/') : new Date().toLocaleDateString('ja-JP');
 
     const coords = await getLatLng(location);
 
@@ -106,7 +109,7 @@ cafeForm.addEventListener('submit', async function(e) {
         pay: paymentString,
         next: nextFood,
         memo: memo,
-        date: recordDate,
+        date: formattedDate,
         tapeClass: getRandomTapeClass(),
         lat: coords ? coords.lat : null,
         lng: coords ? coords.lng : null,
