@@ -1,13 +1,20 @@
 /* 基本変数の定義 */
 :root {
-    --bg-cream: #f9f4ef;
+    --bg-cream: #f8f5f0;
     --accent-coral: #e88d7d;
-    --text-black: #333333;
-    --text-muted: #888888;
+    --text-black: #2c2c2c;
+    --text-muted: #666666;
     --card-shadow: 0 10px 25px rgba(0,0,0,0.03);
     --border-color: #eeeeee;
     --font-serif: 'Playfair Display', serif;
     --font-sans: 'Noto Sans JP', sans-serif;
+    
+    /* スクラップブック用カラー */
+    --dusty-pink: #f4dcd6;
+    --dusty-blue: #d6e2f4;
+    --dusty-green: #d6f4df;
+    --dusty-beige: #f4edd6;
+    --tape-color: rgba(232, 141, 125, 0.4);
 }
 
 body {
@@ -36,17 +43,17 @@ body {
 /* ヒーローセクション */
 .hero {
     display: flex;
-    padding: 6rem 10% 10rem 10%;
+    padding: 4rem 8% 8rem 8%;
     position: relative;
     justify-content: space-between;
     align-items: center;
-    background-color: var(--bg-cream);
+    overflow: hidden;
 }
 
 .hero-content {
-    max-width: 500px;
+    max-width: 480px;
     position: relative;
-    z-index: 2;
+    z-index: 10;
 }
 
 /* テキスト背後のピンクのブラシ跡のような装飾 */
@@ -64,107 +71,193 @@ body {
     z-index: -1;
 }
 
-.decoration-sparkle {
-    position: absolute;
-    top: 20px;
-    left: -60px;
-    color: #e57373; /* 画像のような少し落ち着いた赤 */
-    font-size: 2.5rem;
-}
-
 .decoration-wavy {
-    color: #e57373;
+    color: var(--accent-coral);
     font-size: 1.5rem;
-    margin-bottom: 5px;
+    margin-bottom: 10px;
     letter-spacing: -2px;
 }
 
 .hero-title {
     font-family: var(--font-serif);
-    font-size: 6.5rem; /* より大きく */
+    font-size: 6rem;
+    line-height: 0.85;
+    margin: 0 0 2rem 0;
     font-weight: 700;
-    line-height: 0.9;
-    margin: 0 0 2.5rem 0;
-    color: #1a2a1a; /* かなり深い緑・黒 */
 }
 
 .hero-subtitle {
-    color: #e57373;
+    color: var(--accent-coral);
     font-weight: bold;
+    margin-bottom: 1rem;
     font-size: 1.1rem;
-    margin-bottom: 1.5rem;
 }
 
 .hero-desc {
-    color: #666;
-    font-size: 1.05rem;
+    color: var(--text-muted);
+    font-size: 1rem;
     line-height: 1.6;
     font-style: italic;
 }
 
-.hero-decoration {
+/* コラージュエリア */
+.collage-area {
     position: relative;
-    width: 500px;
-    height: 400px;
+    width: 550px;
+    height: 450px;
+    z-index: 5;
 }
 
-.polaroid {
-    background: white;
-    padding: 12px 12px 40px 12px;
-    box-shadow: 0 8px 25px rgba(0,0,0,0.1);
+/* 背景の紙パーツ */
+.paper {
     position: absolute;
-    transition: transform 0.3s;
+    box-shadow: 2px 2px 10px rgba(0,0,0,0.05);
 }
 
-.polaroid:hover { transform: scale(1.05) rotate(0deg) !important; z-index: 10; }
+.paper-pink {
+    width: 300px;
+    height: 350px;
+    background-color: var(--dusty-pink);
+    top: 20px;
+    left: 20px;
+    transform: rotate(-3deg);
+    z-index: 1;
+}
 
-.img-placeholder {
-    width: 180px;
-    height: 180px;
-    background-color: #eee;
+.paper-blue {
+    width: 250px;
+    height: 200px;
+    background-color: var(--dusty-blue);
+    bottom: 30px;
+    right: 50px;
+    transform: rotate(5deg);
+    z-index: 2;
+}
+
+.paper-grid {
+    width: 200px;
+    height: 250px;
+    background-color: #fff;
+    background-image: 
+        linear-gradient(rgba(0,0,0,0.05) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(0,0,0,0.05) 1px, transparent 1px);
+    background-size: 20px 20px;
+    top: 50px;
+    right: 30px;
+    transform: rotate(2deg);
+    z-index: 1;
+}
+
+.paper-beige {
+    width: 150px;
+    height: 100px;
+    background-color: var(--dusty-beige);
+    top: -10px;
+    left: 200px;
+    transform: rotate(-8deg);
+    z-index: 0;
+}
+
+/* ポラロイド写真 */
+.photo {
+    position: absolute;
+    background: white;
+    padding: 12px 12px 45px 12px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+    z-index: 4;
+}
+
+.photo .img-placeholder {
+    width: 100%;
+    height: 100%;
     background-size: cover;
     background-position: center;
 }
 
-.p1 { transform: rotate(-6deg); top: 0; left: 0; z-index: 3; }
-.p2 { transform: rotate(8deg); top: 40px; right: 50px; z-index: 2; }
-.p3 { transform: rotate(-3deg); bottom: -20px; left: 120px; z-index: 1; }
+.photo-1 {
+    width: 200px;
+    height: 180px;
+    top: 40px;
+    left: 80px;
+    transform: rotate(-5deg);
+}
 
-.note-paper {
+.photo-2 {
+    width: 220px;
+    height: 200px;
+    top: 100px;
+    right: 40px;
+    transform: rotate(4deg);
+}
+
+.photo-3 {
+    width: 180px;
+    height: 160px;
+    bottom: 40px;
+    left: 140px;
+    transform: rotate(-2deg);
+    z-index: 3;
+}
+
+/* マスキングテープ */
+.tape {
     position: absolute;
-    bottom: 20px;
-    right: -20px;
+    background: var(--tape-color);
+    height: 35px;
+    width: 100px;
+    z-index: 10;
+}
+
+.tape-top {
+    top: -15px;
+    left: 50%;
+    transform: translateX(-50%) rotate(-2deg);
+}
+
+.tape-angle {
+    top: -10px;
+    right: -30px;
+    transform: rotate(35deg);
+}
+
+/* メモ用紙 */
+.memo-note {
+    position: absolute;
+    bottom: 10px;
+    right: -40px;
     background: #fffdf0;
-    padding: 2rem;
+    padding: 1.5rem;
     box-shadow: 5px 5px 15px rgba(0,0,0,0.05);
-    transform: rotate(2deg);
+    transform: rotate(3deg);
     font-family: var(--font-serif);
     font-style: italic;
-    font-size: 1.4rem;
-    line-height: 1.3;
+    font-size: 1.3rem;
+    line-height: 1.2;
     color: #444;
-    min-width: 150px;
-    border-left: 2px solid #eee;
+    z-index: 6;
+    border-left: 3px solid #f0e68c;
 }
 
 .paperclip {
     position: absolute;
-    top: -10px;
-    right: 30px;
-    width: 15px;
-    height: 40px;
+    top: -15px;
+    right: 20px;
+    width: 12px;
+    height: 35px;
     border: 2px solid #999;
-    border-radius: 12px;
-    transform: rotate(20deg);
+    border-radius: 10px;
+    transform: rotate(15deg);
 }
 
-.decoration-leaves {
+/* 葉っぱ装飾 */
+.decoration-leaf {
     position: absolute;
-    top: -40px;
-    right: -40px;
-    font-size: 8rem;
-    opacity: 0.15;
-    transform: rotate(15deg);
+    top: -30px;
+    right: -20px;
+    font-size: 6rem;
+    opacity: 0.2;
+    transform: rotate(20deg);
+    z-index: 0;
 }
 
 /* メインコンテンツ */
@@ -410,68 +503,6 @@ body {
     overflow: hidden;
     margin-bottom: 1rem;
     z-index: 1; /* マップが正しく表示されるように */
-}
-
-.map-pin {
-    position: absolute;
-    background: var(--accent-coral);
-    color: white;
-    width: 30px;
-    height: 30px;
-    border-radius: 50% 50% 50% 0;
-    transform: rotate(-45deg);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 0.7rem;
-}
-
-.p1 { top: 40%; left: 30%; }
-.p2 { top: 60%; left: 70%; }
-.p3 { top: 20%; left: 60%; }
-.p4 { top: 70%; left: 20%; }
-
-.map-legend {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 5px;
-    font-size: 0.75rem;
-}
-
-.dot {
-    display: inline-block;
-    width: 10px;
-    height: 10px;
-    border-radius: 50%;
-    margin-right: 5px;
-}
-
-.d1 { background: var(--accent-coral); }
-.d2 { background: #ffeb3b; }
-.d3 { background: #4caf50; }
-
-.tip-section {
-    background: #fff8e1;
-}
-
-.tip-subtitle {
-    font-weight: bold;
-    font-size: 0.9rem;
-    margin-bottom: 1rem;
-}
-
-.tip-content {
-    display: flex;
-    justify-content: space-between;
-}
-
-.tip-text {
-    font-size: 0.8rem;
-    line-height: 1.5;
-}
-
-.tip-image {
-    font-size: 2.5rem;
 }
 
 /* 一覧セクション */
@@ -791,8 +822,7 @@ body {
 
 .footer-grid {
     display: grid;
-    grid-template-columns: 2fr 1fr 1fr;
-    gap: 4rem;
+    grid-template-columns: 1fr;
     margin-bottom: 4rem;
 }
 
@@ -807,30 +837,6 @@ body {
     font-size: 0.9rem;
 }
 
-.link-column h4, .footer-social h4 {
-    font-size: 0.9rem;
-    margin-bottom: 1.5rem;
-}
-
-.link-column ul {
-    list-style: none;
-    padding: 0;
-    margin: 0;
-}
-
-.link-column li {
-    font-size: 0.85rem;
-    color: var(--text-muted);
-    margin-bottom: 0.8rem;
-    cursor: pointer;
-}
-
-.social-icons {
-    display: flex;
-    gap: 15px;
-    font-size: 1.2rem;
-}
-
 .footer-bottom {
     text-align: center;
     font-size: 0.75rem;
@@ -843,10 +849,9 @@ body {
 @media (max-width: 1000px) {
     .hero { flex-direction: column; text-align: center; padding-top: 2rem; }
     .hero-content { margin: 0 auto 3rem auto; }
-    .hero-decoration { margin: 0 auto; width: 100%; height: 350px; }
+    .collage-area { margin: 0 auto; width: 100%; max-width: 450px; height: 350px; }
     .content-grid { grid-template-columns: 1fr; }
-    .footer-grid { grid-template-columns: 1fr; gap: 2rem; }
-    .hero-title { font-size: 3.5rem; }
+    .hero-title { font-size: 4.5rem; }
     .form-row-flex { flex-direction: column; align-items: flex-start; }
     .form-row-flex label { margin-bottom: 10px; width: 100%; }
     .view-options { flex-direction: column; align-items: flex-end; gap: 10px; }
