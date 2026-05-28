@@ -579,12 +579,13 @@ body {
     display: flex;
     align-items: center;
     gap: 30px;
+    margin-top: 35px; /* タイトルとボタンのセット全体をさらに下げました */
 }
 
 .section-title {
     font-family: var(--font-serif);
     font-size: 3rem;
-    margin: 25px 0 0 0; /* 位置をさらに下げるために余白を25pxに増やしました */
+    margin: 0; /* タイトル単体の余白をリセット */
     color: #1a2a1a;
 }
 
