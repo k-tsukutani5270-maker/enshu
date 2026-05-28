@@ -615,6 +615,7 @@ body {
     display: flex;
     align-items: center;
     gap: 15px;
+    margin-top: 35px; /* 左側のタイトルエリアに合わせて位置を下げました */
 }
 
 .filter-input {
