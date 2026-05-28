@@ -45,11 +45,18 @@ function setupFilters() {
 function applyFilter() {
     let filtered = [...allRecords];
 
+    // 1. お気に入りフィルター
+    if (currentFilter === 'Favorites') {
+        filtered = filtered.filter(r => r.is_favorite);
+    }
+
+    // 2. 場所でのキーワード検索
     const locSearch = locationFilterInput.value.toLowerCase().trim();
     if (locSearch) {
         filtered = filtered.filter(r => r.loc.toLowerCase().includes(locSearch));
     }
 
+    // 3. 並び替え
     const sortVal = sortSelect.value;
     if (sortVal === 'latest') {
         filtered.sort((a, b) => b.id - a.id);
@@ -143,7 +150,8 @@ cafeForm.addEventListener('submit', async function(e) {
         date: formattedDate,
         tapeClass: getRandomTapeClass(),
         lat: coords ? coords.lat : null,
-        lng: coords ? coords.lng : null
+        lng: coords ? coords.lng : null,
+        is_favorite: false
     };
 
     const savedRecord = await saveRecordToServer(newRecord);
@@ -171,6 +179,19 @@ async function saveRecordToServer(record) {
     }
 }
 
+async function toggleFavoriteOnServer(id, isFavorite) {
+    try {
+        const response = await fetch(`/api/records/${id}/favorite`, {
+            method: 'PATCH',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ isFavorite }),
+        });
+        if (!response.ok) throw new Error('Toggle favorite failed');
+    } catch (err) {
+        console.error('Error toggling favorite:', err);
+    }
+}
+
 async function loadRecords() {
     try {
         const response = await fetch('/api/records');
@@ -179,6 +200,7 @@ async function loadRecords() {
         
         allRecords.forEach(record => {
             record.tapeClass = record.tape_class || record.tapeClass;
+            record.is_favorite = record.is_favorite || false;
         });
 
         applyFilter();
@@ -232,6 +254,9 @@ function renderCard(record) {
 
     card.innerHTML = `
         <div class="tape ${record.tapeClass || getRandomTapeClass()}"></div>
+        <button class="favorite-btn ${record.is_favorite ? 'active' : ''}" onclick="toggleFavorite(this, ${record.id})">
+            ${record.is_favorite ? '❤️' : '🤍'}
+        </button>
         <div class="bookmark"></div>
         ${imageHtml}
         <div class="card-content">
@@ -262,6 +287,21 @@ function renderCard(record) {
 
     recordList.appendChild(card);
 }
+
+window.toggleFavorite = async function(btn, id) {
+    const record = allRecords.find(r => r.id === id);
+    if (!record) return;
+
+    record.is_favorite = !record.is_favorite;
+    btn.classList.toggle('active');
+    btn.innerHTML = record.is_favorite ? '❤️' : '🤍';
+
+    await toggleFavoriteOnServer(id, record.is_favorite);
+    
+    if (currentFilter === 'Favorites' && !record.is_favorite) {
+        applyFilter();
+    }
+};
 
 window.changeImage = function(btn, direction) {
     const gallery = btn.closest('.card-image-gallery');
