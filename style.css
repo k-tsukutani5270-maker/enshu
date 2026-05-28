@@ -55,7 +55,7 @@ body {
     overflow: hidden;
 }
 
-/* ヒーロー背景の大きなピンクの装飾（理想画像のような丸み） */
+/* ヒーロー背景の大きなピンクの装飾 */
 .hero::before {
     content: "";
     position: absolute;
@@ -73,6 +73,32 @@ body {
     max-width: 480px;
     position: relative;
     z-index: 10;
+}
+
+.decoration-sparkle {
+    position: absolute;
+    color: #e57373;
+    z-index: 15;
+}
+
+.decoration-sparkle.s1 {
+    top: 20px;
+    left: -50px;
+    font-size: 2.8rem;
+}
+
+.decoration-sparkle.s2 {
+    top: -30px;
+    right: 50px;
+    font-size: 1.8rem;
+    transform: rotate(15deg);
+}
+
+.decoration-sparkle.s3 {
+    bottom: 50px;
+    left: -40px;
+    font-size: 1.5rem;
+    transform: rotate(-10deg);
 }
 
 .decoration-wavy {
@@ -518,8 +544,7 @@ body {
 
 /* 一覧セクション */
 .list-section {
-    margin-top: 8rem;
-    padding-top: 4rem;
+    margin-top: 6rem;
     position: relative;
 }
 
@@ -860,7 +885,7 @@ body {
 /* フッター */
 .footer {
     background: white;
-    padding: 6rem 10% 4rem 10%;
+    padding: 5rem 10% 2rem 10%;
     border-top: 1px solid #f0f0f0;
 }
 
@@ -873,7 +898,7 @@ body {
 .footer-logo {
     font-family: var(--font-serif);
     font-size: 2.2rem;
-    margin: 0 0 1.2rem 0;
+    margin: 0 0 1rem 0;
     color: #1a2a1a;
 }
 
@@ -884,17 +909,17 @@ body {
 
 .footer-bottom {
     text-align: center;
-    font-size: 0.85rem;
+    font-size: 0.75rem;
     color: #ccc;
-    padding-top: 3rem;
+    padding-top: 2rem;
     border-top: 1px solid #f9f9f9;
 }
 
 /* レスポンシブ */
 @media (max-width: 1000px) {
     .hero { flex-direction: column; text-align: center; padding-top: 4rem; }
-    .hero-content { margin: 0 auto 5rem auto; }
-    .collage-area { margin: 0 auto; width: 100%; max-width: 500px; height: 420px; }
+    .hero-content { margin: 0 auto 4rem auto; }
+    .collage-area { margin: 0 auto; width: 100%; max-width: 480px; height: 380px; }
     .content-grid { grid-template-columns: 1fr; }
     .hero-title { font-size: 5rem; }
     .form-row-flex { flex-direction: column; align-items: flex-start; }
@@ -902,9 +927,9 @@ body {
     .view-options { flex-direction: column; align-items: flex-end; gap: 12px; }
     .filter-input { width: 100%; }
     
-    .paper-pink { width: 90%; left: 5%; height: 350px; }
-    .paper-blue { width: 70%; bottom: 10px; right: 20px; }
-    .photo-1 { width: 200px; height: 180px; left: 50px; }
-    .photo-2 { width: 220px; height: 200px; right: 30px; }
-    .photo-3 { width: 180px; height: 160px; left: 120px; }
+    .paper-pink { width: 80%; left: 10%; }
+    .paper-blue { width: 60%; bottom: 20px; }
+    .photo-1 { width: 180px; }
+    .photo-2 { width: 200px; }
+    .photo-3 { width: 160px; }
 }
