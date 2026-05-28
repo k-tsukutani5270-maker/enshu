@@ -584,7 +584,7 @@ body {
 .section-title {
     font-family: var(--font-serif);
     font-size: 3rem;
-    margin: 0;
+    margin: 25px 0 0 0; /* 位置をさらに下げるために余白を25pxに増やしました */
     color: #1a2a1a;
 }
 
