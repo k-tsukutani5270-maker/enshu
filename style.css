@@ -242,6 +242,7 @@ body {
 }
 
 .form-row-flex input[type="text"], 
+.form-row-flex input[type="date"],
 .form-row-flex textarea,
 .form-row-flex select {
     flex: 1;
@@ -553,11 +554,21 @@ body {
     gap: 15px;
 }
 
+.filter-input {
+    padding: 0.5rem 1rem;
+    border: 1px solid #ddd;
+    border-radius: 20px;
+    font-size: 0.85rem;
+    background: white;
+    width: 200px;
+}
+
 .sort-select {
-    padding: 0.3rem 1rem;
+    padding: 0.45rem 1rem;
     border: 1px solid #ddd;
     border-radius: 5px;
     font-size: 0.8rem;
+    background: white;
 }
 
 .view-icons {
@@ -862,4 +873,6 @@ body {
     .hero-title { font-size: 3.5rem; }
     .form-row-flex { flex-direction: column; align-items: flex-start; }
     .form-row-flex label { margin-bottom: 10px; width: 100%; }
+    .view-options { flex-direction: column; align-items: flex-end; gap: 10px; }
+    .filter-input { width: 100%; }
 }

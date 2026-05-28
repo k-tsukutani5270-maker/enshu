@@ -2,6 +2,8 @@
 const cafeForm = document.getElementById('cafe-form');
 const recordList = document.getElementById('record-list');
 const filterBtns = document.querySelectorAll('.filter-btn');
+const locationFilterInput = document.getElementById('location-filter');
+const sortSelect = document.getElementById('sort-select');
 
 // 状態管理
 let allRecords = [];
@@ -25,7 +27,7 @@ document.addEventListener('DOMContentLoaded', () => {
     setupFilters();
 });
 
-// フィルターボタンの設定
+// フィルター・ソートの設定
 function setupFilters() {
     filterBtns.forEach(btn => {
         btn.addEventListener('click', () => {
@@ -35,17 +37,68 @@ function setupFilters() {
             applyFilter();
         });
     });
+
+    // 場所での絞り込み
+    locationFilterInput.addEventListener('input', applyFilter);
+    // ソート順の変更
+    sortSelect.addEventListener('change', applyFilter);
 }
 
 function applyFilter() {
-    let filtered = allRecords;
+    let filtered = [...allRecords];
+
+    // 1. お気に入りなどのタブフィルター
     if (currentFilter === 'Favorites') {
-        filtered = allRecords.filter(r => r.is_favorite);
+        filtered = filtered.filter(r => r.is_favorite);
     }
     
-    // 既存のリストをクリアして再描画
+    // 2. 場所でのキーワード検索
+    const locSearch = locationFilterInput.value.toLowerCase().trim();
+    if (locSearch) {
+        filtered = filtered.filter(r => r.loc.toLowerCase().includes(locSearch));
+    }
+
+    // 3. 並び替え
+    const sortVal = sortSelect.value;
+    if (sortVal === 'latest') {
+        // 日付またはIDで降順
+        filtered.sort((a, b) => b.id - a.id);
+    } else if (sortVal === 'rating') {
+        // 評価順で降順
+        filtered.sort((a, b) => parseInt(b.rating) - parseInt(a.rating));
+    }
+    
+    // 画面のカードを更新
     recordList.innerHTML = '';
     filtered.forEach(record => renderCard(record));
+
+    // 地図のピンも更新
+    updateMapMarkers(filtered);
+}
+
+/**
+ * 地図のマーカーを現在のフィルター結果に合わせて更新
+ */
+function updateMapMarkers(filteredRecords) {
+    // 既存のマーカーを全て削除
+    markers.forEach(m => map.removeLayer(m));
+    markers = [];
+
+    // 絞り込まれた結果だけピンを立てる
+    filteredRecords.forEach(record => {
+        if (record.lat && record.lng) {
+            const marker = L.marker([record.lat, record.lng])
+                .addTo(map)
+                .bindPopup(`<b>${record.name}</b><br>${record.loc}`);
+            markers.push(marker);
+        }
+    });
+
+    // ピンが1つ以上あれば、それらが収まるように表示範囲を調整
+    if (markers.length > 0) {
+        const group = new L.featureGroup(markers);
+        map.fitBounds(group.getBounds().pad(0.1));
+    }
 }
 
 // 住所から緯度経度を取得
@@ -72,7 +125,7 @@ cafeForm.addEventListener('submit', async function(e) {
     const shopName = document.getElementById('shop-name').value;
     const location = document.getElementById('location').value;
     const photoFiles = document.getElementById('photo').files;
-    const visitDateValue = document.getElementById('visit-date').value; // 入力された日付
+    const visitDateValue = document.getElementById('visit-date').value;
     const food = document.getElementById('food').value;
     const ratingValue = document.querySelector('input[name="rating"]:checked').value;
     
@@ -83,7 +136,6 @@ cafeForm.addEventListener('submit', async function(e) {
     const nextFood = document.getElementById('next-food').value;
     const memo = document.getElementById('memo').value;
     
-    // 日付のフォーマットを調整 (YYYY-MM-DD -> YYYY/MM/DD)
     const formattedDate = visitDateValue ? visitDateValue.replace(/-/g, '/') : new Date().toLocaleDateString('ja-JP');
 
     const coords = await getLatLng(location);
@@ -121,26 +173,10 @@ cafeForm.addEventListener('submit', async function(e) {
         newRecord.id = savedRecord.id;
         allRecords.unshift(newRecord);
         applyFilter();
-        if (coords) {
-            addMarkerToMap(newRecord);
-            map.setView([coords.lat, coords.lng], 13);
-        }
     }
 
     cafeForm.reset();
 });
-
-/**
- * マップにマーカーを追加
- */
-function addMarkerToMap(record) {
-    if (record.lat && record.lng) {
-        const marker = L.marker([record.lat, record.lng])
-            .addTo(map)
-            .bindPopup(`<b>${record.name}</b><br>${record.loc}`);
-        markers.push(marker);
-    }
-}
 
 /**
  * サーバーにレコードを保存
@@ -185,22 +221,12 @@ async function loadRecords() {
         if (!response.ok) throw new Error('Fetch failed');
         allRecords = await response.json();
         
-        // 既存のマーカーをクリア
-        markers.forEach(m => map.removeLayer(m));
-        markers = [];
-        
         allRecords.forEach(record => {
             record.tapeClass = record.tape_class || record.tapeClass;
             record.is_favorite = record.is_favorite || false;
-            addMarkerToMap(record);
         });
 
         applyFilter();
-
-        if (markers.length > 0) {
-            const group = new L.featureGroup(markers);
-            map.fitBounds(group.getBounds().pad(0.1));
-        }
     } catch (err) {
         console.error('Error loading records:', err);
     }
