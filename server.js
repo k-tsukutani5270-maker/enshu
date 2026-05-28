@@ -99,6 +99,19 @@ app.patch('/api/records/:id/favorite', async (req, res) => {
   }
 });
 
+// APIエンドポイント: 記録を削除
+app.delete('/api/records/:id', async (req, res) => {
+  const { id } = req.params;
+
+  try {
+    await pool.query('DELETE FROM cafe_records WHERE id = $1', [id]);
+    res.json({ success: true });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: err.message });
+  }
+});
+
 // サーバー起動
 app.listen(port, () => {
   console.log(`Server is running at port ${port}`);

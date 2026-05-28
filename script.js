@@ -192,6 +192,18 @@ async function toggleFavoriteOnServer(id, isFavorite) {
     }
 }
 
+async function deleteRecordFromServer(id) {
+    try {
+        const response = await fetch(`/api/records/${id}`, {
+            method: 'DELETE',
+        });
+        if (!response.ok) throw new Error('Delete failed');
+    } catch (err) {
+        console.error('Error deleting record:', err);
+        alert('削除に失敗しました。');
+    }
+}
+
 async function loadRecords() {
     try {
         const response = await fetch('/api/records');
@@ -254,9 +266,14 @@ function renderCard(record) {
 
     card.innerHTML = `
         <div class="tape ${record.tapeClass || getRandomTapeClass()}"></div>
-        <button class="favorite-btn ${record.is_favorite ? 'active' : ''}" onclick="toggleFavorite(this, ${record.id})">
-            ${record.is_favorite ? '❤️' : '🤍'}
-        </button>
+        <div class="card-actions">
+            <button class="favorite-btn ${record.is_favorite ? 'active' : ''}" onclick="toggleFavorite(this, ${record.id})">
+                ${record.is_favorite ? '❤️' : '🤍'}
+            </button>
+            <button class="delete-btn" onclick="deleteRecord(${record.id})">
+                🗑️
+            </button>
+        </div>
         <div class="bookmark"></div>
         ${imageHtml}
         <div class="card-content">
@@ -301,6 +318,14 @@ window.toggleFavorite = async function(btn, id) {
     if (currentFilter === 'Favorites' && !record.is_favorite) {
         applyFilter();
     }
+};
+
+window.deleteRecord = async function(id) {
+    if (!confirm('このカフェノートを削除してもよろしいですか？')) return;
+
+    await deleteRecordFromServer(id);
+    allRecords = allRecords.filter(r => r.id !== id);
+    applyFilter();
 };
 
 window.changeImage = function(btn, direction) {
