@@ -21,8 +21,8 @@
 body {
     font-family: var(--font-sans);
     background-color: var(--bg-cream);
-    /* 全体に紙の質感を出すための非常に薄いドット背景 */
-    background-image: radial-gradient(#dcdcdc 0.5px, transparent 0.5px);
+    /* 紙の質感を出すための非常に薄いドット背景 */
+    background-image: radial-gradient(#dcdcdc 0.8px, transparent 0.8px);
     background-size: 30px 30px;
     color: var(--text-black);
     margin: 0;
@@ -55,19 +55,18 @@ body {
     overflow: hidden;
 }
 
-/* ヒーロー背景の大きなピンクの装飾 */
+/* ヒーロー背景の大きなピンクの装飾（理想画像のような丸み） */
 .hero::before {
     content: "";
     position: absolute;
     top: -5%;
     left: -15%;
-    width: 50%;
-    height: 110%;
-    background: #fce4ec;
-    opacity: 0.5;
+    width: 60%;
+    height: 120%;
+    background: radial-gradient(circle, #fce4ec 0%, transparent 70%);
+    opacity: 0.6;
     z-index: -1;
-    border-radius: 50% 30% 60% 40%;
-    filter: blur(50px);
+    border-radius: 50%;
 }
 
 .hero-content {
@@ -146,8 +145,8 @@ body {
     height: 320px;
     background-color: #fff;
     background-image: 
-        linear-gradient(rgba(100,100,100,0.07) 1px, transparent 1px),
-        linear-gradient(90deg, rgba(100,100,100,0.07) 1px, transparent 1px);
+        linear-gradient(rgba(100,100,100,0.08) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(100,100,100,0.08) 1px, transparent 1px);
     background-size: 20px 20px;
     top: 50px;
     right: 50px;
@@ -262,7 +261,7 @@ body {
 /* 葉っぱ装飾 */
 .decoration-leaf {
     position: absolute;
-    top: -50px;
+    top: -60px;
     right: -40px;
     font-size: 8rem;
     opacity: 0.15;
@@ -524,7 +523,7 @@ body {
     position: relative;
 }
 
-/* 一覧エリアの背景に方眼紙テクスチャを追加 */
+/* 一覧エリアの背景に方眼紙テクスチャを追加（ノートのページのような演出） */
 .list-section::before {
     content: "";
     position: absolute;
@@ -537,7 +536,7 @@ body {
         linear-gradient(rgba(100,100,100,0.05) 1px, transparent 1px),
         linear-gradient(90deg, rgba(100,100,100,0.05) 1px, transparent 1px);
     background-size: 30px 30px;
-    opacity: 0.6;
+    opacity: 0.7;
     z-index: -1;
     border-top: 2px dashed #e2e2e0;
 }
@@ -551,7 +550,7 @@ body {
 
 .section-title {
     font-family: var(--font-serif);
-    font-size: 3.2rem;
+    font-size: 3rem;
     margin: 0;
     color: #1a2a1a;
 }
@@ -624,58 +623,44 @@ body {
 /* カードグリッド */
 .record-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
-    gap: 4rem;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 3.5rem;
 }
 
-/* カードリデザイン */
+/* カードリデザイン (軽量版かつ質感を維持) */
 .card {
     background: white;
-    border-radius: 25px;
-    padding: 1.8rem;
-    box-shadow: 0 15px 40px rgba(0,0,0,0.04);
+    border-radius: 20px;
+    padding: 1.4rem;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.03);
     position: relative;
     transition: transform 0.3s, box-shadow 0.3s;
-}
-
-/* カードの後ろに色紙パーツをうっすら配置 */
-.card::after {
-    content: "";
-    position: absolute;
-    top: 5px;
-    left: 5px;
-    width: 100%;
-    height: 100%;
-    background: var(--dusty-blue);
-    opacity: 0.2;
-    z-index: -1;
-    border-radius: 25px;
-    transform: rotate(2deg);
+    border: 1px solid rgba(0,0,0,0.02);
 }
 
 .card:hover { 
-    transform: translateY(-12px);
-    box-shadow: 0 25px 55px rgba(0,0,0,0.08);
+    transform: translateY(-8px);
+    box-shadow: 0 20px 45px rgba(0,0,0,0.06);
 }
 
 /* お気に入りボタン */
 .favorite-btn {
     position: absolute;
-    top: 25px;
-    right: 60px;
+    top: 20px;
+    right: 55px;
     background: white;
     border: 1px solid #f2f2f2;
     border-radius: 50%;
-    width: 42px;
-    height: 42px;
+    width: 38px;
+    height: 38px;
     display: flex;
     align-items: center;
     justify-content: center;
     cursor: pointer;
     z-index: 11;
-    box-shadow: 0 4px 12px rgba(0,0,0,0.06);
+    box-shadow: 0 4px 10px rgba(0,0,0,0.05);
     transition: all 0.2s;
-    font-size: 1.3rem;
+    font-size: 1.2rem;
 }
 
 .favorite-btn:hover {
@@ -692,24 +677,39 @@ body {
 .bookmark {
     position: absolute;
     top: -10px;
-    right: 25px;
-    width: 30px;
-    height: 55px;
+    right: 20px;
+    width: 28px;
+    height: 50px;
     background: var(--accent-coral);
     clip-path: polygon(0 0, 100% 0, 100% 100%, 50% 85%, 0 100%);
     z-index: 10;
     box-shadow: 0 2px 5px rgba(0,0,0,0.1);
 }
 
+/* マスキングテープ */
+.tape {
+    position: absolute;
+    top: -15px;
+    left: 50%;
+    transform: translateX(-50%) rotate(-1deg);
+    width: 100px;
+    height: 32px;
+    z-index: 5;
+    opacity: 0.8;
+}
+
+.tape-gingham { background: repeating-linear-gradient(45deg, #ffcdd2, #ffcdd2 5px, #ffffff 5px, #ffffff 10px); }
+.tape-blue { background: #b3e5fc; border: 1px dashed rgba(0,0,0,0.1); }
+.tape-yellow { background: #fff9c4; border-bottom: 2px solid rgba(0,0,0,0.05); }
+
 /* ギャラリースタイル */
 .card-image-gallery {
     position: relative;
     width: 100%;
-    height: 260px;
-    margin-bottom: 1.8rem;
+    height: 240px;
+    margin-bottom: 1.2rem;
     overflow: hidden;
-    border-radius: 15px;
-    box-shadow: inset 0 0 15px rgba(0,0,0,0.05);
+    border-radius: 12px;
 }
 
 .card-image {
@@ -720,7 +720,7 @@ body {
     top: 0;
     left: 0;
     opacity: 0;
-    transition: opacity(0.4s) ease;
+    transition: opacity 0.3s ease;
 }
 
 .card-image.active {
@@ -730,138 +730,132 @@ body {
 
 .gallery-counter {
     position: absolute;
-    bottom: 15px;
-    right: 15px;
-    background: rgba(0, 0, 0, 0.45);
+    bottom: 12px;
+    right: 12px;
+    background: rgba(0, 0, 0, 0.4);
     color: white;
-    padding: 4px 12px;
-    border-radius: 15px;
+    padding: 3px 10px;
+    border-radius: 12px;
     font-size: 0.75rem;
     z-index: 2;
-    backdrop-filter: blur(2px);
 }
 
 .gallery-prev, .gallery-next {
     position: absolute;
     top: 50%;
     transform: translateY(-50%);
-    background: rgba(255, 255, 255, 0.85);
+    background: rgba(255, 255, 255, 0.8);
     border: none;
     border-radius: 50%;
-    width: 36px;
-    height: 36px;
+    width: 34px;
+    height: 34px;
     cursor: pointer;
     z-index: 2;
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 0.9rem;
-    transition: background 0.2s, transform 0.2s;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    font-size: 0.85rem;
+    transition: background 0.2s;
 }
 
-.gallery-prev:hover, .gallery-next:hover { background: white; transform: translateY(-50%) scale(1.1); }
-.gallery-prev { left: 12px; }
-.gallery-next { right: 12px; }
+.gallery-prev:hover, .gallery-next:hover { background: white; }
+.gallery-prev { left: 10px; }
+.gallery-next { right: 10px; }
 
 .card-date {
-    font-size: 0.85rem;
+    font-size: 0.8rem;
     color: var(--text-muted);
-    margin-bottom: 0.5rem;
+    margin-bottom: 0.4rem;
 }
 
 .card-title {
     font-family: var(--font-serif);
-    font-size: 1.8rem;
-    margin: 0 0 0.4rem 0;
+    font-size: 1.6rem;
+    margin: 0 0 0.3rem 0;
     color: #1a2a1a;
 }
 
 .card-location {
-    font-size: 0.9rem;
+    font-size: 0.85rem;
     color: var(--accent-coral);
-    margin-bottom: 1.2rem;
+    margin-bottom: 0.8rem;
     font-weight: 500;
 }
 
 .card-rating {
     color: #ffca28;
-    font-size: 1.1rem;
-    margin-bottom: 1.5rem;
+    font-size: 1rem;
+    margin-bottom: 1.2rem;
 }
 
 .card-detail-item {
-    font-size: 0.95rem;
-    margin-bottom: 0.7rem;
+    font-size: 0.9rem;
+    margin-bottom: 0.5rem;
 }
 
 .card-detail-label {
     font-weight: bold;
-    color: #bbb;
-    margin-right: 12px;
+    color: #aaa;
+    margin-right: 10px;
 }
 
 .card-memo {
-    margin-top: 1.8rem;
-    font-size: 1rem;
+    margin-top: 1.4rem;
+    font-size: 0.95rem;
     color: #444;
-    background: #fdf9f2;
-    padding: 1.5rem;
-    border-radius: 15px;
-    line-height: 1.7;
-    border-left: 5px solid var(--dusty-pink);
+    background: #fdfaf5;
+    padding: 1.2rem;
+    border-radius: 12px;
+    line-height: 1.6;
+    border-left: 4px solid var(--dusty-pink);
 }
 
 .card-footer {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    margin-top: 2.5rem;
-    padding-top: 1.5rem;
+    margin-top: 2rem;
+    padding-top: 1.2rem;
     border-top: 1px solid #f5f5f5;
 }
 
 .pay-tag {
-    font-size: 0.85rem;
+    font-size: 0.8rem;
     color: var(--text-muted);
     display: flex;
     align-items: center;
-    gap: 8px;
+    gap: 6px;
 }
 
 .map-btn {
-    font-size: 0.85rem;
+    font-size: 0.8rem;
     color: #aaa;
     text-decoration: none;
     display: flex;
     align-items: center;
-    gap: 8px;
+    gap: 6px;
     transition: color 0.2s;
-    padding: 0.5rem 1rem;
-    background: #f8f8f8;
-    border-radius: 20px;
 }
 
-.map-btn:hover { color: var(--accent-coral); background: #fffaf9; }
+.map-btn:hover { color: var(--accent-coral); }
 
 /* もっと見るボタン */
 .load-more {
     text-align: center;
-    margin: 8rem 0;
+    margin: 6rem 0;
 }
 
 .load-more-btn {
-    padding: 1.3rem 4rem;
-    border: 1px solid #e0e0e0;
+    padding: 1.2rem 3.5rem;
+    border: 1px solid #ddd;
     background: white;
     border-radius: 60px;
-    font-size: 1.1rem;
+    font-size: 1rem;
     cursor: pointer;
     transition: all 0.3s;
-    box-shadow: 0 10px 25px rgba(0,0,0,0.02);
 }
 
-.load-more-btn:hover { background: #fdfdfd; transform: translateY(-3px); box-shadow: 0 15px 35px rgba(0,0,0,0.05); }
+.load-more-btn:hover { background: #fdfdfd; transform: translateY(-3px); }
 
 /* フッター */
 .footer {
@@ -873,19 +867,19 @@ body {
 .footer-grid {
     display: grid;
     grid-template-columns: 1fr;
-    margin-bottom: 5rem;
+    margin-bottom: 4rem;
 }
 
 .footer-logo {
     font-family: var(--font-serif);
-    font-size: 2.5rem;
-    margin: 0 0 1.5rem 0;
+    font-size: 2.2rem;
+    margin: 0 0 1.2rem 0;
     color: #1a2a1a;
 }
 
 .footer-brand p {
     color: var(--text-muted);
-    font-size: 1.1rem;
+    font-size: 1rem;
 }
 
 .footer-bottom {
@@ -905,7 +899,7 @@ body {
     .hero-title { font-size: 5rem; }
     .form-row-flex { flex-direction: column; align-items: flex-start; }
     .form-row-flex label { margin-bottom: 12px; width: 100%; }
-    .view-options { flex-direction: column; align-items: flex-end; gap: 15px; }
+    .view-options { flex-direction: column; align-items: flex-end; gap: 12px; }
     .filter-input { width: 100%; }
     
     .paper-pink { width: 90%; left: 5%; height: 350px; }
